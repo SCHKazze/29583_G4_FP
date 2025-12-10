@@ -1,0 +1,206 @@
+// GRUPO 4 - Puerta automática de garaje (Lanford)
+// Simulación por consola con registro de acciones en CSV
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <conio.h>
+#include <windows.h>
+
+#define ARCHIVO_LOG "registro_puerta.csv"
+#define MAX_NOMBRE 64
+
+typedef enum { CERRADA = 0, ABIERTA = 1 } EstadoPuerta;
+
+
+void limpiarBufferEntrada(void) {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { /* descartar */ }
+}
+
+void leerLinea(char *dest, size_t tam) {
+    if (fgets(dest, (int)tam, stdin) != NULL) {
+        size_t n = strlen(dest);
+        if (n > 0 && dest[n - 1] == '\n') dest[n - 1] = '\0';
+    } else {
+
+        if (tam > 0) dest[0] = '\0';
+    }
+}
+
+void timestampISO(char *dest, size_t tam) {
+    time_t t = time(NULL);
+    struct tm *tmv = localtime(&t);
+
+    strftime(dest, tam, "%Y-%m-%d %H:%M:%S", tmv);
+}
+
+
+void asegurarCabeceraLog(void) {
+    FILE *f = fopen(ARCHIVO_LOG, "a+");
+    if (!f) return;
+
+    fseek(f, 0, SEEK_END);
+    long tam = ftell(f);
+    if (tam == 0) {
+        fprintf(f, "fecha_hora,accion,persona,estado_final\n");
+        fflush(f);
+    }
+    fclose(f);
+}
+
+void registrarAccion(const char *accion, const char *persona, const char *estadoFinal) {
+    asegurarCabeceraLog();
+    FILE *f = fopen(ARCHIVO_LOG, "a");
+    if (!f) {
+        printf("No se pudo abrir el archivo de registro.\n");
+        return;
+    }
+    char fecha[32];
+    timestampISO(fecha, sizeof(fecha));
+    fprintf(f, "%s,%s,%s,%s\n", fecha, accion, persona, estadoFinal);
+    fclose(f);
+}
+
+
+void mostrarEstado(EstadoPuerta estado) {
+    printf("Estado actual de la puerta: %s\n", (estado == ABIERTA) ? "ABIERTA" : "CERRADA");
+}
+
+void abrirPuerta(EstadoPuerta *estado, const char *persona) {
+    if (*estado == ABIERTA) {
+        printf("La puerta ya está ABIERTA. No se realiza acción.\n");
+        registrarAccion("ABRIR (sin cambio)", persona, "ABIERTA");
+        return;
+    }
+    printf("Accion: ABRIR (control remoto Lanford)\n");
+
+    printf("Abriendo...\n");
+
+    *estado = ABIERTA;
+    printf("Puerta ABIERTA.\n");
+    registrarAccion("ABRIR", persona, "ABIERTA");
+}
+
+void cerrarPuerta(EstadoPuerta *estado, const char *persona) {
+    if (*estado == CERRADA) {
+        printf("La puerta ya está CERRADA. No se realiza acción.\n");
+        registrarAccion("CERRAR (sin cambio)", persona, "CERRADA");
+        return;
+    }
+    printf("Accion: CERRAR (control remoto Lanford)\n");
+
+    printf("Cerrando...\n");
+
+    *estado = CERRADA;
+    printf("Puerta CERRADA.\n");
+    registrarAccion("CERRAR", persona, "CERRADA");
+}
+
+void mostrarRegistro(void) {
+    FILE *f = fopen(ARCHIVO_LOG, "r");
+    if (!f) {
+        printf("Aún no existe el archivo de registro.\n");
+        return;
+    }
+
+    printf("\n=== REGISTRO DE OPERACIONES ===\n");
+    char linea[256];
+    int esPrimera = 1;
+    while (fgets(linea, sizeof(linea), f) != NULL) {
+        if (esPrimera) {
+            printf("FECHA/HORA             | ACCION             | PERSONA                | ESTADO FINAL\n");
+            printf("-----------------------+--------------------+------------------------+--------------\n");
+            esPrimera = 0;
+            continue;
+        }
+        char fecha[64] = "", accion[64] = "", persona[64] = "", estado[32] = "";
+        sscanf(linea, "%63[^,],%63[^,],%63[^,],%31[^\n]", fecha, accion, persona, estado);
+        printf("%-23s | %-18s | %-22s | %-12s\n", fecha, accion, persona, estado);
+    }
+    printf("=== FIN REGISTRO ===\n\n");
+    fclose(f);
+}
+
+void limpiarRegistro(void) {
+    printf("¿Seguro que desea limpiar el registro? (s/n): ");
+    int c = getchar();
+    limpiarBufferEntrada();
+    if (c == 's' || c == 'S') {
+        FILE *f = fopen(ARCHIVO_LOG, "w");
+        if (!f) {
+            printf("No se pudo limpiar el registro.\n");
+            return;
+        }
+        fprintf(f, "fecha_hora,accion,persona,estado_final\n");
+        fclose(f);
+        printf("Registro limpiado.\n");
+    } else {
+        printf("Accion cancelada.\n");
+    }
+}
+
+
+int main(void) {
+    EstadoPuerta estado = CERRADA;
+    asegurarCabeceraLog();
+
+    int opcion;
+    char persona[MAX_NOMBRE];
+
+    do {
+        printf("\n======= PUERTA DE GARAJE LANFORD =======\n");
+        printf("\n==== BIENVENIDOS A NUESTRO PROGRAMA =====\n");
+        printf("\n==== PROGRAMA DISEÑADO POR EL GRUPO 4 =====\n");
+        mostrarEstado(estado);
+        printf("1) Abrir (boton control remoto)\n");
+        printf("2) Cerrar (boton control remoto)\n");
+        printf("3) Mostrar registro de operaciones\n");
+        printf("4) Limpiar registro (opcional)\n");
+        printf("0) Salir\n");
+        printf("Seleccione una opcion: ");
+
+        if (scanf("%d", &opcion) != 1) {
+            printf("Entrada no valida.\n");
+            limpiarBufferEntrada();
+            continue;
+        }
+        limpiarBufferEntrada();
+
+        switch (opcion) {
+            case 1:
+                printf("Nombre de la persona que ABRE: ");
+                leerLinea(persona, sizeof(persona));
+                if (strlen(persona) == 0) strcpy(persona, "SIN_NOMBRE");
+                abrirPuerta(&estado, persona);
+                break;
+
+            case 2:
+                printf("Nombre de la persona que CIERRA: ");
+                leerLinea(persona, sizeof(persona));
+                if (strlen(persona) == 0) strcpy(persona, "SIN_NOMBRE");
+                cerrarPuerta(&estado, persona);
+                break;
+
+            case 3:
+                mostrarRegistro();
+                break;
+
+            case 4:
+                limpiarRegistro();
+                break;
+
+            case 0:
+                printf("Saliendo...\n");
+                break;
+
+            default:
+                printf("Opcion no valida.\n");
+        }
+
+        getch();
+        system("cls");
+    } while (opcion != 0);
+
+    return 0;
+}
