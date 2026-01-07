@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+
+    char Nombre[50];
+    printf("Ingrese su nombre: ");
+    scanf("%s", Nombre);
+
+    char Apellido[50];
+    printf("Ingrese su apellido: ");
+    scanf("%s", Apellido);
+
+
+    char Completo[101];
+    strcpy(Completo, Nombre);
+    strcat(Completo, " ");
+    strcat(Completo, Apellido);
+
+    printf("Su Nombre Completo es: %s", Completo);
+}
