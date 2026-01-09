@@ -1,0 +1,201 @@
+//CRIOLLO JAHIR EJC1
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    char frase[200];
+    int letras = 0, espacios = 0;
+
+    printf("Ingrese una frase: ");
+    fgets(frase, sizeof(frase), stdin);
+
+    frase[strcspn(frase, "\n")] = '\0';
+
+    for (int i = 0; frase[i] != '\0'; i++)
+    {
+        if (frase[i] == ' ')
+            espacios++;
+        else
+            letras++;
+    }
+
+    printf("Letras: %d\n", letras);
+    printf("Espacios: %d\n", espacios);
+
+    return 0;
+}
+
+//CRIOLLO JAHIR EJC2
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main(void)
+{
+    char texto[200], limpio[200];
+    int j = 0;
+
+    printf("Ingrese una cadena: ");
+    fgets(texto, sizeof(texto), stdin);
+    texto[strcspn(texto, "\n")] = '\0';
+
+    for (int i = 0; texto[i] != '\0'; i++)
+    {
+        if (texto[i] != ' ')
+            limpio[j++] = (char)tolower((unsigned char)texto[i]);
+    }
+    limpio[j] = '\0';
+
+    int esPal = 1;
+    for (int i = 0, k = j - 1; i < k; i++, k--)
+    {
+        if (limpio[i] != limpio[k])
+        {
+            esPal = 0;
+            break;
+        }
+    }
+
+    if (esPal)
+        printf("Es un palindromo\n");
+    else
+        printf("No es un palindromo\n");
+
+    return 0;
+}
+
+//CRIOLLO JAHIR EJC3
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+
+    char Nombre[50];
+    printf("Ingrese su nombre: ");
+    scanf("%s", Nombre);
+
+    char Apellido[50];
+    printf("Ingrese su apellido: ");
+    scanf("%s", Apellido);
+
+
+    char Completo[101];
+    strcpy(Completo, Nombre);
+    strcat(Completo, " ");
+    strcat(Completo, Apellido);
+
+    printf("Su Nombre Completo es: %s", Completo);
+}
+
+//CRIOLLO JAHIR EJC4
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    char texto[200], palabra[50];
+    char *pos;
+
+    printf("Ingrese un texto: ");
+    fgets(texto, sizeof(texto), stdin);
+    texto[strcspn(texto, "\n")] = '\0';
+
+    printf("Ingrese la palabra a buscar: ");
+    scanf("%49s", palabra);
+
+    pos = strstr(texto, palabra);
+
+    if (pos != NULL)
+        printf("Palabra encontrada en la posicion: %ld\n", (long)(pos - texto));
+    else
+        printf("Palabra no encontrada\n");
+
+    return 0;
+}
+ 
+//CRIOLLO JAHIR EJC5
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+    char texto[50];
+    long numero;
+
+    printf("Ingrese un numero: ");
+    scanf("%49s", texto);
+
+    numero = strtol(texto, NULL, 10);
+
+    printf("Numero: %ld\n", numero);
+    printf("Cuadrado: %ld\n", numero * numero);
+
+    return 0;
+}
+
+//CRIOLLO JAHIR EJC6
+#include <stdio.h>
+#include <string.h>
+
+void invertir(char s[])
+{
+    int i = 0;
+    int j = (int)strlen(s) - 1;
+
+    while (i < j)
+    {
+        char aux = s[i];
+        s[i] = s[j];
+        s[j] = aux;
+        i++;
+        j--;
+    }
+}
+
+int main(void)
+{
+    char texto[100], copia[100];
+
+    printf("Ingrese una cadena: ");
+    fgets(texto, sizeof(texto), stdin);
+    texto[strcspn(texto, "\n")] = '\0';
+
+    strcpy(copia, texto);
+    invertir(copia);
+
+    printf("Original: %s\n", texto);
+    printf("Invertida: %s\n", copia);
+
+    return 0;
+}
+
+//CRIOLLO JAHIR EJC7
+#include <stdio.h>
+#include <ctype.h>
+
+int contarVocales(const char *s)
+{
+    int cont = 0;
+
+    for (int i = 0; s[i] != '\0'; i++)
+    {
+        char c = (char)tolower((unsigned char)s[i]);
+        if (c=='a' || c=='e' || c=='i' || c=='o' || c=='u')
+            cont++;
+    }
+    return cont;
+}
+
+int main(void)
+{
+    char texto[100];
+
+    printf("Ingrese una cadena: ");
+    fgets(texto, sizeof(texto), stdin);
+
+    printf("Cantidad de vocales: %d\n", contarVocales(texto));
+
+    return 0;
+}
