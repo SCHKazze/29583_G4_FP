@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main() {
+
+    int min, max;
+    int secreto;
+    int maxIntentos;
+    int intento = 1;
+    int num;
+    int resultado;
+    int acertado = 0;
+
+    int intentos[10][3];
+    /* RF01: Configuración dinámica del rango */
+    printf("Ingrese el limite minimo (positivo > 0): ");
+    scanf("%d", &min);
+
+    if (min <= 0) {
+        printf("ERROR: Solo se permiten numeros positivos mayores que 0.\n");
+        printf("El programa se cerrara.\n");
+        exit(0);
+    }
+
+    printf("Ingrese el limite maximo (positivo > 0): ");
+    scanf("%d", &max);
+
+    if (max <= 0) {
+        printf("ERROR: Solo se permiten numeros positivos mayores que 0.\n");
+        printf("El programa se cerrara.\n");
+        exit(0);
+    }
+
+    if (max <= min) {
+        printf("ERROR: El limite maximo debe ser mayor que el limite minimo.\n");
+        printf("El programa se cerrara.\n");
+        exit(0);
+    }
+
+    /* RF02: Configuración dinámica de intentos */
+    do {
+        printf("Ingrese el numero maximo de intentos (1-10): ");
+        scanf("%d", &maxIntentos);
+
+        if (maxIntentos <= 0) {
+            printf("ERROR: No se permite 0 ni numeros negativos.\n");
+            printf("El programa se cerrara.\n");
+            exit(0);
+        }
+
+    } while (maxIntentos < 1 || maxIntentos > 10);
+
+    srand(time(NULL));
+    secreto = rand() % (max - min + 1) + min;
+
+    /* RF03 y RF04 */
+    while (intento <= maxIntentos && !acertado) {
+
+        printf("\nIntento %d - Ingrese un numero: ", intento);
+        scanf("%d", &num);
+
+        if (num <= 0) {
+            printf("ERROR: Solo se permiten numeros positivos mayores que 0.\n");
+            printf("El programa se cerrara.\n");
+            exit(0);
+        }
+
+        if (num < min || num > max) {
+            printf("Numero fuera de rango (%d - %d)\n", min, max);
+            continue;
+        }
+
+        intentos[intento - 1][0] = intento;
+        intentos[intento - 1][1] = num;
+
+        if (num < secreto) {
+            resultado = 0;
+            printf("Resultado: Muy bajo\n");
+        } else if (num > secreto) {
+            resultado = 1;
+            printf("Resultado: Muy alto\n");
+        } else {
+            resultado = 2;
+            printf("Resultado: Correcto\n");
+            acertado = 1;
+        }
+
+        intentos[intento - 1][2] = resultado;
+        intento++;
+    }
+
+    /* RF05: Visualización de resumen */
+    printf("\n----- RESUMEN DE INTENTOS -----\n");
+    printf("Intento\tNumero\tResultado\n");
+
+    for (int i = 0; i < intento - 1; i++) {
+        printf("%d\t%d\t", intentos[i][0], intentos[i][1]);
+
+        if (intentos[i][2] == 0)
+            printf("Bajo\n");
+        else if (intentos[i][2] == 1)
+            printf("Alto\n");
+        else
+            printf("Correcto\n");
+    }
+
+    if (!acertado) {
+        printf("\nNo se adivino el numero secreto.\n");
+        printf("El numero secreto era: %d\n", secreto);
+    }
+
+    return 0;
+}
