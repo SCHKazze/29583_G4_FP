@@ -3,3 +3,7 @@ Hola Ing, Jenny Ruiz somos el Grupo N4, conformado por los integrantes:
 Criollo Solano Jahir Alexander
 Jefferson Stalyn Caisaguano Vega
 Christopher Alexander Mendoza Cortez 
+
+
+PROYECTO
+Link Del Video: https://drive.google.com/file/d/1yux5SDBNULt_nwuxWZUyTphpb9rV9itd/view?usp=vids_web
